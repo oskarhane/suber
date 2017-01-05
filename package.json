@@ -1,0 +1,22 @@
+{
+  "name": "suber",
+  "version": "1.0.0",
+  "description": "A message bus",
+  "main": "lib/bus.js",
+  "scripts": {
+    "build": "standard && babel src -d lib --ignore \"**/*.test.js\" ",
+    "test": "jest --watch"
+  },
+  "author": "Oskar Hane",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-jest": "^18.0.0",
+    "babel-preset-es2015": "^6.18.0",
+    "jest-cli": "^18.1.0",
+    "standard": "^8.6.0"
+  },
+  "dependencies": {
+    "uuid": "^3.0.1"
+  }
+}
