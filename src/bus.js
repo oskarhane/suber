@@ -49,3 +49,7 @@ const bus = {
 
 export const getBus = () => bus
 export const emitFn = (fn) => emitTo = fn
+export const createReduxMiddleware = () => (next) => (action) => {
+  bus.send(action.type, action)
+  return next(action)
+}

@@ -1,5 +1,5 @@
 /* global test, expect, jest */
-import { getBus, emitFn } from './bus'
+import { getBus, emitFn, createReduxMiddleware } from './bus'
 
 test('can get the bus', () => {
   // Given
@@ -136,4 +136,24 @@ test('bus emits messages with emitFn', () => {
   // Then
   expect(cb).toHaveBeenCalledWith(data)
   expect(myEmitFn).toHaveBeenCalledWith(type, data)
+})
+
+test('can create a redux middleware that repeats all redux actions into bus', () => {
+  // Given
+  const b = getBus()
+  let cb = jest.fn()
+  const type = 'FROM_REDUX'
+  const data = {id: 10, type}
+  const reduxAction = data
+  const reduxNext = jest.fn()
+  const reduxFn = (mw) => mw(reduxNext)(reduxAction)
+  const mw = createReduxMiddleware()
+
+  // When
+  b.take(type, cb)
+  reduxFn(mw) // Fake call from redux
+
+  // Then
+  expect(cb).toHaveBeenCalledWith(data)
+  expect(reduxNext).toHaveBeenCalledWith(data)
 })
