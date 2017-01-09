@@ -1,5 +1,5 @@
 /* global test, expect, jest */
-import { getBus } from './bus'
+import { getBus, emitFn } from './bus'
 
 test('can get the bus', () => {
   // Given
@@ -118,4 +118,22 @@ test('subscribers can unsubscribe', () => {
 
   //
   expect(cb).toHaveBeenCalledTimes(1)
+})
+
+test('bus emits messages with emitFn', () => {
+  // Given
+  const b = getBus()
+  let cb = jest.fn()
+  let myEmitFn = jest.fn()
+  const type = 'emitSubject'
+  const data = {id: 10}
+
+  // When
+  b.take(type, cb)
+  emitFn(myEmitFn)
+  b.send(type, data)
+
+  // Then
+  expect(cb).toHaveBeenCalledWith(data)
+  expect(myEmitFn).toHaveBeenCalledWith(type, data)
 })

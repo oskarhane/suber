@@ -1,6 +1,8 @@
 import { v4 } from 'uuid'
 
 const subscriptions = {}
+let emitTo = null
+
 const addSubscriptionType = (type) => {
   subscriptions[type] = subscriptions[type] || {}
 }
@@ -36,6 +38,7 @@ const take = (type, fn, filterFn = null) => {
 const send = (type, data) => {
   if (!type) return false
   sendDataToSubscribers(type, data)
+  if (emitTo) emitTo(type, data)
 }
 
 const bus = {
@@ -45,3 +48,4 @@ const bus = {
 }
 
 export const getBus = () => bus
+export const emitFn = (fn) => emitTo = fn
