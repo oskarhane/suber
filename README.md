@@ -7,8 +7,8 @@ but without having to store everything in the Redux global store.
 Simple standalone usage:
 
 ```javascript
-// Import (not available yet)
-import { getBus } from '@oskarhane/suber'
+// Import
+import { getBus } from 'suber'
 
 // Get bus
 const bus = getBus()
@@ -17,7 +17,7 @@ const bus = getBus()
 const unsub = bus.take('MY_CHANNEL', (data) => {
   console.log(data)
 })
-// or just one
+// or just one (unsubscribes automatically)
 bus.one('MY_CHANNEL', (data) => {
   console.log(data)
 })
@@ -33,7 +33,7 @@ the Redux ecosystem of great middlewares.
 ```javascript
 // app.js
 // App init file
-import { emitFn, createReduxMiddleWare } from '@oskarhane/suber'
+import { emitFn, createReduxMiddleWare } from 'suber'
 import { createStore, applyMiddleware } from 'redux'
 
 // Init

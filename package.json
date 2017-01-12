@@ -1,14 +1,27 @@
 {
   "name": "suber",
   "version": "1.0.0",
-  "description": "A message bus",
-  "main": "lib/bus.js",
+  "description": "A global message / event bus prepared for usage in combination with other bus systems",
+  "main": "lib/bus",
   "scripts": {
     "build": "npm run lint && babel src -d lib --ignore \"**/*.test.js\" ",
     "lint": "standard",
     "test": "jest --watch"
   },
-  "author": "Oskar Hane",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/oskarhane/suber.git"
+  },
+  "author": {
+    "name": "Oskar Hane",
+    "email": "npm@oskarhane.com"
+  },
+  "homepage": "http://oskarhane.com",
+  "keywords": [
+    "channels",
+    "event bus",
+    "message bus"
+  ],
   "license": "MIT",
   "devDependencies": {
     "babel-cli": "^6.18.0",
