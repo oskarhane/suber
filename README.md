@@ -17,8 +17,8 @@ const bus = getBus()
 const unsub = bus.take('MY_CHANNEL', (data) => {
   console.log(data)
 })
-// or just once
-bus.once('MY_CHANNEL', (data) => {
+// or just one
+bus.one('MY_CHANNEL', (data) => {
   console.log(data)
 })
 
@@ -64,7 +64,7 @@ emitFn((channel, message, source) => {
 const responseAction = Math.floor(Math.round()*100 + 1)
 
 // Listen for a single message on that channel
-bus.once('GET_USER_RESPONSE_' + responseAction, (data) => {
+bus.one('GET_USER_RESPONSE_' + responseAction, (data) => {
   console.log(data)
 })
 
@@ -80,7 +80,7 @@ bus.send('GET_USER', {id: 1, responseAction })
 
 ### Methods
 - [`take`](#take)
-- [`once`](#once)
+- [`one`](#one)
 - [`send`](#send)
 
 ### Utility functions
@@ -106,8 +106,8 @@ on the channel. See test file for example.
 #### Returns
 - `unsubscribe: Function` Call this function to unsubscribe this `fn` on the channel.
 
-### <a id="once"></a> `once(channel, fn, filterFn)`
-Sets up a listener on the bus and calls `fn` *onc* time a message with a matching `channel` arrives.
+### <a id="one"></a> `one(channel, fn, filterFn)`
+Sets up a listener on the bus and calls `fn` *one* time a message with a matching `channel` arrives.
 Just like `take` above but with automatic unsubscription after the first message.
 
 ### <a id="send"></a> `send(channel, message, source)`

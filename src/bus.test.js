@@ -40,7 +40,7 @@ test('can take one or multiple messages', () => {
 
   // When
   b.take(channel, cb)
-  b.once(channel, cb2)
+  b.one(channel, cb2)
 
   b.send(channel, data)
   b.send(channel, data)

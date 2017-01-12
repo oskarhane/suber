@@ -26,7 +26,7 @@ const take = (channel, fn, filterFn = null, once = false) => {
   if (!channel || !fn) return false
   return addChannelSubscriber(channel, fn, filterFn, once)
 }
-const once = (channel, fn, filterFn) => take(channel, fn, filterFn, true)
+const one = (channel, fn, filterFn) => take(channel, fn, filterFn, true)
 const send = (channel, message, source = 'app') => {
   if (!channel) return
   sendMessageToSubscribers(channel, message)
@@ -36,7 +36,7 @@ const send = (channel, message, source = 'app') => {
 // Local variables / constants
 let emitTo = null
 const subscriptions = {}
-const bus = { take, once, send }
+const bus = { take, one, send }
 
 // Exported functions
 export const getBus = () => bus
