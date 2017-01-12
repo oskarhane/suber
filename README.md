@@ -3,6 +3,15 @@ A global messge / event bus prepared for usage in combination with
 Redux to take advantage of the Redux ecosystem for handling side effects,
 but without having to store everything in the Redux global store.
 
+## Installation
+suber is published on npm https://www.npmjs.com/package/suber
+
+```bash
+yarn add suber
+# or
+npm install suber
+```
+
 ## Usage
 Simple standalone usage:
 
