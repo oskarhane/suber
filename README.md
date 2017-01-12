@@ -107,7 +107,7 @@ on the channel. See test file for example.
 - `unsubscribe: Function` Call this function to unsubscribe this `fn` on the channel.
 
 ### <a id="one"></a> `one(channel, fn, filterFn)`
-Sets up a listener on the bus and calls `fn` *one* time a message with a matching `channel` arrives.
+Sets up a listener on the bus and calls `fn` **one time** time once a message with a matching `channel` arrives.
 Just like `take` above but with automatic unsubscription after the first message.
 
 ### <a id="send"></a> `send(channel, message, source)`
