@@ -6,7 +6,8 @@
   "scripts": {
     "build": "npm run lint && babel src -d lib --ignore \"**/*.test.js\" ",
     "lint": "standard",
-    "test": "jest --watch"
+    "test": "jest --watch",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type" : "git",
