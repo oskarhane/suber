@@ -4,7 +4,8 @@
   "description": "A message bus",
   "main": "lib/bus.js",
   "scripts": {
-    "build": "standard && babel src -d lib --ignore \"**/*.test.js\" ",
+    "build": "npm run lint && babel src -d lib --ignore \"**/*.test.js\" ",
+    "lint": "standard",
     "test": "jest --watch"
   },
   "author": "Oskar Hane",

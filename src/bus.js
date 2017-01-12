@@ -1,27 +1,19 @@
 import { v4 } from 'uuid'
 
-const subscriptions = {}
-let emitTo = null
-
+// Private utility functions
 const addChannelSubscriber = (channel, fn, filterFn, once) => {
   subscriptions[channel] = subscriptions[channel] || {}
   const id = v4()
   const unsub = createUnsub(channel, id)
   const newFn = once !== true ? fn : (message) => (unsub() && fn(message))
-  subscriptions[channel][id] = {
-    fn: newFn,
-    filterFn
-  }
+  subscriptions[channel][id] = { fn: newFn, filterFn }
   return unsub
 }
 const createUnsub = (channel, id) => () => delete subscriptions[channel][id]
 const sendMessageToSubscribers = (channel, message) => {
-  if (typeof subscriptions[channel] === 'undefined') {
-    return
-  }
-  const subs = subscriptions[channel]
-  Object.keys(subs).forEach((key) => {
-    const sub = subs[key]
+  if (!subscriptions[channel]) return
+  Object.keys(subscriptions[channel]).forEach((key) => {
+    const sub = subscriptions[channel][key]
     if (sub.filterFn) {
       if (!sub.filterFn(message)) return
     }
@@ -29,27 +21,26 @@ const sendMessageToSubscribers = (channel, message) => {
   })
 }
 
+// Exposed bus methods
 const take = (channel, fn, filterFn = null, once = false) => {
   if (!channel || !fn) return false
   return addChannelSubscriber(channel, fn, filterFn, once)
 }
 const once = (channel, fn, filterFn) => take(channel, fn, filterFn, true)
-
 const send = (channel, message, source = 'app') => {
-  if (!channel) return false
+  if (!channel) return
   sendMessageToSubscribers(channel, message)
   if (emitTo) emitTo(channel, message, source)
 }
 
-const bus = {
-  subscriptions,
-  take,
-  once,
-  send
-}
+// Local variables / constants
+let emitTo = null
+const subscriptions = {}
+const bus = { take, once, send }
 
+// Exported functions
 export const getBus = () => bus
-export const emitFn = (fn) => emitTo = fn
+export const emitFn = (fn) => (emitTo = fn)
 export const createReduxMiddleware = () => (next) => (action) => {
   bus.send(action.type, action, 'redux')
   return next(action)

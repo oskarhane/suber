@@ -9,31 +9,6 @@ test('can get the bus', () => {
   expect(b).toBeTruthy()
 })
 
-test('will fail to register an empty listener', () => {
-  // Given
-  const b = getBus()
-
-  // When
-  b.take('any channel', null)
-
-  // Then
-  expect(b.subscriptions['any channel']).toBeUndefined()
-})
-
-test('can register to take messages on the bus', () => {
-  // Given
-  const b = getBus()
-  let cb = jest.fn()
-
-  // When
-  b.take('any channel', cb)
-
-  // Then
-  expect(Object.keys(b.subscriptions)).toEqual(['any channel'])
-  expect(Object.keys(b.subscriptions['any channel']).length).toBe(1)
-  expect(cb).not.toHaveBeenCalled()
-})
-
 test('can send messages on the bus', () => {
   // Given
   const b = getBus()
