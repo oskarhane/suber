@@ -28,7 +28,7 @@ bus.send('MY_CHANNEL', 'Hello world')
 
 Usage with Redux.
 This way we can use local state only but still take advantage of
-the Redux ecosystem of create middlewares.
+the Redux ecosystem of great middlewares.
 
 ```javascript
 // app.js
@@ -90,7 +90,7 @@ bus.send('GET_USER', {id: 1, responseAction })
 ## Factory
 Factories are functions that returns you the bus.
 
-### <a id="getBus"></a> `getBus`
+### <a id="getBus"></a> `getBus()`
 Returns the singleton bus.
 
 ## Methods
