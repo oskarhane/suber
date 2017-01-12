@@ -1,9 +1,7 @@
-import { v4 } from 'uuid'
-
 // Private utility functions
 const addChannelSubscriber = (channel, fn, filterFn, once) => {
   subscriptions[channel] = subscriptions[channel] || {}
-  const id = v4()
+  const id = nextId++
   const unsub = createUnsub(channel, id)
   const newFn = once !== true ? fn : (message) => (unsub() && fn(message))
   subscriptions[channel][id] = { fn: newFn, filterFn }
@@ -34,6 +32,7 @@ const send = (channel, message, source = 'app') => {
 }
 
 // Local variables / constants
+let nextId = 0
 let emitTo = null
 const subscriptions = {}
 const bus = { take, one, send }
