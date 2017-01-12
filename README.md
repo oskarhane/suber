@@ -17,8 +17,12 @@ import { getBus } from '@oskarhane/suber'
 // Get bus
 const bus = getBus()
 
-// Listen
+// Listen until manual unsubscription
 const unsub = bus.take('MY_TYPE', (data) => {
+  console.log(data)
+})
+// or just once
+bus.once('MY_TYPE', (data) => {
   console.log(data)
 })
 

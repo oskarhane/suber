@@ -55,6 +55,27 @@ test('can send messages on the bus', () => {
   expect(cb).toHaveBeenCalledWith(data)
 })
 
+test('can take one or multiple messages', () => {
+  // Given
+  const b = getBus()
+  let cb = jest.fn()
+  let cb2 = jest.fn()
+  const type = 'my type'
+  const data = {id: 1}
+
+  // When
+  b.take(type, cb)
+  b.once(type, cb2)
+
+  b.send(type, data)
+  b.send(type, data)
+  b.send(type, data)
+
+  // Then
+  expect(cb).toHaveBeenCalledTimes(3)
+  expect(cb2).toHaveBeenCalledTimes(1)
+})
+
 test('can have multiple subscribers for a type', () => {
   // Given
   const b = getBus()

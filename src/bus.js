@@ -3,17 +3,16 @@ import { v4 } from 'uuid'
 const subscriptions = {}
 let emitTo = null
 
-const addSubscriptionType = (type) => {
+const addTypeSubscriber = (type, fn, filterFn, once) => {
   subscriptions[type] = subscriptions[type] || {}
-}
-const addTypeSubscriber = (type, fn, filterFn) => {
-  addSubscriptionType(type)
   const id = v4()
+  const unsub = createUnsub(type, id)
+  const newFn = once !== true ? fn : (data) => (unsub() && fn(data))
   subscriptions[type][id] = {
-    fn,
+    fn: newFn,
     filterFn
   }
-  return createUnsub(type, id)
+  return unsub
 }
 const createUnsub = (type, id) => () => delete subscriptions[type][id]
 const sendDataToSubscribers = (type, data) => {
@@ -30,10 +29,11 @@ const sendDataToSubscribers = (type, data) => {
   })
 }
 
-const take = (type, fn, filterFn = null) => {
+const take = (type, fn, filterFn = null, once = false) => {
   if (!type || !fn) return false
-  return addTypeSubscriber(type, fn, filterFn)
+  return addTypeSubscriber(type, fn, filterFn, once)
 }
+const once = (type, fn, filterFn) => take(type, fn, filterFn, true)
 
 const send = (type, data) => {
   if (!type) return false
@@ -44,6 +44,7 @@ const send = (type, data) => {
 const bus = {
   subscriptions,
   take,
+  once,
   send
 }
 
