@@ -1,10 +1,11 @@
-# suber - a message bus
-A global messge / event bus prepared for usage in combination with
-Redux to take advantage of the Redux ecosystem for handling side effects,
-but without having to store everything in the Redux global store.
+# suber
+A global message / event bus prepared for usage in combination with
+other bus systems. For example Redux to take advantage of the Redux
+ecosystem for handling side effects, but without having to store
+everything in the Redux global store.
 
 ## Installation
-suber is published on npm https://www.npmjs.com/package/suber
+suber is published on npm: https://www.npmjs.com/package/suber
 
 ```bash
 yarn add suber
@@ -135,6 +136,7 @@ Functions to configure or extend the bus.
 When set, everything that is sent on the bus gets repeated to `fn`.
 #### Arguments
 - `fn: Function(channel, message, source)` The function to be called with every message on the bus.
+
 #### Returns `void`
 
 ### <a id="createReduxMiddleWare"></a> `createReduxMiddleWare()`
