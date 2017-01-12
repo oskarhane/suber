@@ -3,42 +3,42 @@ import { v4 } from 'uuid'
 const subscriptions = {}
 let emitTo = null
 
-const addTypeSubscriber = (type, fn, filterFn, once) => {
-  subscriptions[type] = subscriptions[type] || {}
+const addChannelSubscriber = (channel, fn, filterFn, once) => {
+  subscriptions[channel] = subscriptions[channel] || {}
   const id = v4()
-  const unsub = createUnsub(type, id)
-  const newFn = once !== true ? fn : (data) => (unsub() && fn(data))
-  subscriptions[type][id] = {
+  const unsub = createUnsub(channel, id)
+  const newFn = once !== true ? fn : (message) => (unsub() && fn(message))
+  subscriptions[channel][id] = {
     fn: newFn,
     filterFn
   }
   return unsub
 }
-const createUnsub = (type, id) => () => delete subscriptions[type][id]
-const sendDataToSubscribers = (type, data) => {
-  if (typeof subscriptions[type] === 'undefined') {
+const createUnsub = (channel, id) => () => delete subscriptions[channel][id]
+const sendMessageToSubscribers = (channel, message) => {
+  if (typeof subscriptions[channel] === 'undefined') {
     return
   }
-  const subs = subscriptions[type]
+  const subs = subscriptions[channel]
   Object.keys(subs).forEach((key) => {
     const sub = subs[key]
     if (sub.filterFn) {
-      if (!sub.filterFn(data)) return
+      if (!sub.filterFn(message)) return
     }
-    sub.fn(data)
+    sub.fn(message)
   })
 }
 
-const take = (type, fn, filterFn = null, once = false) => {
-  if (!type || !fn) return false
-  return addTypeSubscriber(type, fn, filterFn, once)
+const take = (channel, fn, filterFn = null, once = false) => {
+  if (!channel || !fn) return false
+  return addChannelSubscriber(channel, fn, filterFn, once)
 }
-const once = (type, fn, filterFn) => take(type, fn, filterFn, true)
+const once = (channel, fn, filterFn) => take(channel, fn, filterFn, true)
 
-const send = (type, data, source = 'app') => {
-  if (!type) return false
-  sendDataToSubscribers(type, data)
-  if (emitTo) emitTo(type, data, source)
+const send = (channel, message, source = 'app') => {
+  if (!channel) return false
+  sendMessageToSubscribers(channel, message)
+  if (emitTo) emitTo(channel, message, source)
 }
 
 const bus = {

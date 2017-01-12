@@ -14,10 +14,10 @@ test('will fail to register an empty listener', () => {
   const b = getBus()
 
   // When
-  b.take('any type', null)
+  b.take('any channel', null)
 
   // Then
-  expect(b.subscriptions['any type']).toBeUndefined()
+  expect(b.subscriptions['any channel']).toBeUndefined()
 })
 
 test('can register to take messages on the bus', () => {
@@ -26,11 +26,11 @@ test('can register to take messages on the bus', () => {
   let cb = jest.fn()
 
   // When
-  b.take('any type', cb)
+  b.take('any channel', cb)
 
   // Then
-  expect(Object.keys(b.subscriptions)).toEqual(['any type'])
-  expect(Object.keys(b.subscriptions['any type']).length).toBe(1)
+  expect(Object.keys(b.subscriptions)).toEqual(['any channel'])
+  expect(Object.keys(b.subscriptions['any channel']).length).toBe(1)
   expect(cb).not.toHaveBeenCalled()
 })
 
@@ -38,18 +38,18 @@ test('can send messages on the bus', () => {
   // Given
   const b = getBus()
   let cb = jest.fn()
-  const type = 'my type'
+  const channel = 'my channel'
   const data = {id: 1}
 
   // When
-  b.take(type, cb)
+  b.take(channel, cb)
 
   // Then
   expect(b.send).toBeDefined()
   expect(cb).not.toHaveBeenCalled()
 
   // When
-  b.send(type, data)
+  b.send(channel, data)
 
   // Then
   expect(cb).toHaveBeenCalledWith(data)
@@ -60,37 +60,37 @@ test('can take one or multiple messages', () => {
   const b = getBus()
   let cb = jest.fn()
   let cb2 = jest.fn()
-  const type = 'my type'
+  const channel = 'my channel'
   const data = {id: 1}
 
   // When
-  b.take(type, cb)
-  b.once(type, cb2)
+  b.take(channel, cb)
+  b.once(channel, cb2)
 
-  b.send(type, data)
-  b.send(type, data)
-  b.send(type, data)
+  b.send(channel, data)
+  b.send(channel, data)
+  b.send(channel, data)
 
   // Then
   expect(cb).toHaveBeenCalledTimes(3)
   expect(cb2).toHaveBeenCalledTimes(1)
 })
 
-test('can have multiple subscribers for a type', () => {
+test('can have multiple subscribers for a channel', () => {
   // Given
   const b = getBus()
   let cb1 = jest.fn()
   let cb2 = jest.fn()
   let cb3 = jest.fn()
-  const type = 'my type 2'
-  const nonSentType = 'notype'
+  const channel = 'my channel 2'
+  const nonSentchannel = 'nochannel'
   const data = {id: 2}
 
   // When
-  b.take(type, cb1)
-  b.take(type, cb2)
-  b.take(nonSentType, cb3)
-  b.send(type, data)
+  b.take(channel, cb1)
+  b.take(channel, cb2)
+  b.take(nonSentchannel, cb3)
+  b.send(channel, data)
 
   // Then
   expect(cb1).toHaveBeenCalledWith(data)
@@ -103,15 +103,15 @@ test('subscribers filter function', () => {
   const b = getBus()
   let cb = jest.fn()
   let cb2 = jest.fn()
-  const type = 'filter type'
+  const channel = 'filter channel'
   const filterFn = (data) => data.id === 1
   const filterFn2 = (data) => data.id === 2
   const data = {id: 1}
 
   // When
-  b.take(type, cb, filterFn)
-  b.take(type, cb2, filterFn2)
-  b.send(type, data)
+  b.take(channel, cb, filterFn)
+  b.take(channel, cb2, filterFn2)
+  b.send(channel, data)
 
   // Then
   expect(cb).toHaveBeenCalledWith(data)
@@ -122,20 +122,20 @@ test('subscribers can unsubscribe', () => {
   // Given
   const b = getBus()
   let cb = jest.fn()
-  const type = 'my unsub type'
+  const channel = 'my unsub channel'
   const data = {id: 1}
 
   // When
-  const unsub = b.take(type, cb)
+  const unsub = b.take(channel, cb)
   expect(unsub).toBeTruthy()
-  b.send(type, data)
+  b.send(channel, data)
 
   // Then
   expect(cb).toHaveBeenCalledWith(data)
 
   // When
   unsub()
-  b.send(type, data)
+  b.send(channel, data)
 
   //
   expect(cb).toHaveBeenCalledTimes(1)
@@ -146,33 +146,33 @@ test('bus emits messages with emitFn', () => {
   const b = getBus()
   let cb = jest.fn()
   let myEmitFn = jest.fn()
-  const type = 'emitSubject'
+  const channel = 'emitSubject'
   const data = {id: 10}
   const source = 'test'
 
   // When
-  b.take(type, cb)
+  b.take(channel, cb)
   emitFn(myEmitFn)
-  b.send(type, data, source)
+  b.send(channel, data, source)
 
   // Then
   expect(cb).toHaveBeenCalledWith(data)
-  expect(myEmitFn).toHaveBeenCalledWith(type, data, source)
+  expect(myEmitFn).toHaveBeenCalledWith(channel, data, source)
 })
 
 test('can create a redux middleware that repeats all redux actions into bus', () => {
   // Given
   const b = getBus()
   let cb = jest.fn()
-  const type = 'FROM_REDUX'
-  const data = {id: 10, type}
+  const channel = 'FROM_REDUX'
+  const data = {id: 10, type: channel}
   const reduxAction = data
   const reduxNext = jest.fn()
   const reduxFn = (mw) => mw(reduxNext)(reduxAction)
   const mw = createReduxMiddleware()
 
   // When
-  b.take(type, cb)
+  b.take(channel, cb)
   reduxFn(mw) // Fake call from redux
 
   // Then
