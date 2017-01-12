@@ -148,15 +148,16 @@ test('bus emits messages with emitFn', () => {
   let myEmitFn = jest.fn()
   const type = 'emitSubject'
   const data = {id: 10}
+  const source = 'test'
 
   // When
   b.take(type, cb)
   emitFn(myEmitFn)
-  b.send(type, data)
+  b.send(type, data, source)
 
   // Then
   expect(cb).toHaveBeenCalledWith(data)
-  expect(myEmitFn).toHaveBeenCalledWith(type, data)
+  expect(myEmitFn).toHaveBeenCalledWith(type, data, source)
 })
 
 test('can create a redux middleware that repeats all redux actions into bus', () => {

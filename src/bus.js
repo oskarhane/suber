@@ -35,10 +35,10 @@ const take = (type, fn, filterFn = null, once = false) => {
 }
 const once = (type, fn, filterFn) => take(type, fn, filterFn, true)
 
-const send = (type, data) => {
+const send = (type, data, source = 'app') => {
   if (!type) return false
   sendDataToSubscribers(type, data)
-  if (emitTo) emitTo(type, data)
+  if (emitTo) emitTo(type, data, source)
 }
 
 const bus = {
@@ -51,6 +51,6 @@ const bus = {
 export const getBus = () => bus
 export const emitFn = (fn) => emitTo = fn
 export const createReduxMiddleware = () => (next) => (action) => {
-  bus.send(action.type, action)
+  bus.send(action.type, action, 'redux')
   return next(action)
 }
