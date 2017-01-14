@@ -1,6 +1,6 @@
-# suber
-A global message / event bus prepared for usage in combination with
-other bus systems. For example Redux to take advantage of the Redux
+# suber - a message bus compatible with Redux middlewares
+A message bus / pubsub prepared for usage in combination with
+other bus/pubsub systems. For example, Redux to take advantage of the Redux
 ecosystem for handling side effects, but without having to store
 everything in the Redux global store.
 
@@ -43,16 +43,16 @@ the Redux ecosystem of great middlewares.
 ```javascript
 // app.js
 // App init file
-import { emitFn, createReduxMiddleWare } from 'suber'
+import { applyMiddleware as applySuberMiddleware, createReduxMiddleWare } from 'suber'
 import { createStore, applyMiddleware } from 'redux'
 
 // Init
 const mw = createReduxMiddleWare()
-// Next line enables passing everything from Redux into suber
+// Next line enables sending actions from Redux into suber
 let store = createStore(yourApp, applyMiddleware(mw))
 
-// Pass everything from suber into Redux
-emitFn((channel, message, source) => {
+// Send everything from suber into Redux
+applySuberMiddleware((_) => (channel, message, source) => {
   // No loop-backs
   if (source === 'redux') return
   // Send to Redux with the channel as the action type
@@ -94,7 +94,8 @@ bus.send('GET_USER', {id: 1, responseAction })
 - [`send`](#send)
 
 ### Utility functions
-- [`emitFn`](#emitFn)
+- [`applyMiddleware`](#applyMiddleware)
+- [`applyReduxMiddleware`](#applyReduxMiddleware)
 - [`createReduxMiddleWare`](#createReduxMiddleWare)
 
 ## Factory
@@ -113,8 +114,7 @@ Sets up a listener on the bus and calls `fn` every time a message with a matchin
 - `filterFn: Function(message)` An optional filter function that can be used to just listen for a specific kind of data
 on the channel. See test file for example.
 
-#### Returns
-- `unsubscribe: Function` Call this function to unsubscribe this `fn` on the channel.
+#### Returns `unsubscribe: Function` Call this function to unsubscribe this `fn` on the channel.
 
 ### <a id="one"></a> `one(channel, fn, filterFn)`
 Sets up a listener on the bus and calls `fn` **one time** time once a message with a matching `channel` arrives.
@@ -126,16 +126,27 @@ Send a message on a channel on the bus.
 - `channel: String` The channel to send the message on.
 - `message: any` The message, can be of any data type.
 - `source: String` Optional argument to specify the message source.
-Best used when `emitFn` and `createReduxMiddleWare` both are specified to avoid loop-backs.
+Best used when `applyMiddleware` and `createReduxMiddleWare` both are specified to avoid loop-backs.
 
 #### Returns `void`
 
 ## Utility functions
 Functions to configure or extend the bus.
-### <a id="emitFn"></a> `emitFn(fn)`
-When set, everything that is sent on the bus gets repeated to `fn`.
+### <a id="applyMiddleware"></a> `applyMiddleware(fn)`
+Add middleware to Suber. All messages on all channels gets passed to the middleware.
 #### Arguments
 - `fn: Function(channel, message, source)` The function to be called with every message on the bus.
+
+#### Returns `void`
+
+### <a id="applyReduxMiddleware"></a> `applyReduxMiddleware(rmw)`
+Add a Redux middleware to Suber. This way the excellent Redux middlewares for
+handling side effects like redux-saga and redux-observable can be used without
+Redux.
+The params for `store.getState` and `next` are unsuable, so middlewares that rely on
+these will not be compatible since Suber isn't about state / reducers.
+#### Arguments
+- `rmw: Function()` The Redux middleware with `(store) => (next) => (action) => ` signature.
 
 #### Returns `void`
 

@@ -1,5 +1,5 @@
 /* global test, expect, jest */
-import { getBus, emitFn, createReduxMiddleware } from './bus'
+import { getBus, applyMiddleware, createReduxMiddleware, applyReduxMiddleware } from './bus'
 
 test('can get the bus', () => {
   // Given
@@ -116,23 +116,24 @@ test('subscribers can unsubscribe', () => {
   expect(cb).toHaveBeenCalledTimes(1)
 })
 
-test('bus emits messages with emitFn', () => {
+test('exposes applyMiddleware', () => {
   // Given
   const b = getBus()
   let cb = jest.fn()
-  let myEmitFn = jest.fn()
+  let myInnerMw = jest.fn()
+  let myMw = (send) => myInnerMw
   const channel = 'emitSubject'
   const data = {id: 10}
   const source = 'test'
 
   // When
   b.take(channel, cb)
-  emitFn(myEmitFn)
+  applyMiddleware(myMw)
   b.send(channel, data, source)
 
   // Then
   expect(cb).toHaveBeenCalledWith(data)
-  expect(myEmitFn).toHaveBeenCalledWith(channel, data, source)
+  expect(myInnerMw).toHaveBeenCalledWith(channel, data, source)
 })
 
 test('can create a redux middleware that repeats all redux actions into bus', () => {
@@ -153,4 +154,33 @@ test('can create a redux middleware that repeats all redux actions into bus', ()
   // Then
   expect(cb).toHaveBeenCalledWith(data)
   expect(reduxNext).toHaveBeenCalledWith(data)
+})
+
+test('exposes applyReduxMiddleware with same mw signature as redux', () => {
+  // Given
+  const b = getBus()
+  let cb = jest.fn()
+  const channel = 'TO_REDUX_MW'
+  const data = {id: 10}
+  let actualInput = null
+  const expectedInput = Object.assign({}, data, {type: channel, source: "app"})
+  const mw = (store) => {
+    expect(store.getState).toBeDefined()
+    expect(store.dispatch).toBeDefined()
+    return (next) => {
+      expect(next).toBeDefined()
+      return (data) => {
+        actualInput = data
+      }
+    }
+  }
+
+  // When
+  applyReduxMiddleware(mw)
+  b.take(channel, cb)
+  b.send(channel, data)
+
+  // Then
+  expect(cb).toHaveBeenCalledWith(data)
+  expect(actualInput).toEqual(expectedInput)
 })
