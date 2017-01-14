@@ -15,7 +15,7 @@ const sendMessageToSubscribers = (channel, message) => {
     if (sub.filterFn) {
       if (!sub.filterFn(message)) return
     }
-    sub.fn(message)
+    setTimeout(((sub) => sub.fn(message))(sub), 0)
   })
 }
 
