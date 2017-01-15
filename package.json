@@ -5,7 +5,7 @@
   "main": "lib/bus",
   "scripts": {
     "build": "npm run lint && babel src -d lib --ignore \"**/*.test.js\" ",
-    "lint": "standard",
+    "lint": "standard --fix",
     "test": "jest --watch",
     "prepublish": "npm run build"
   },

@@ -163,7 +163,7 @@ test('exposes applyReduxMiddleware with same mw signature as redux', () => {
   const channel = 'TO_REDUX_MW'
   const data = {id: 10}
   let actualInput = null
-  const expectedInput = Object.assign({}, data, {type: channel, source: "app"})
+  const expectedInput = Object.assign({}, data, {type: channel, source: 'app'})
   const mw = (store) => {
     expect(store.getState).toBeDefined()
     expect(store.dispatch).toBeDefined()

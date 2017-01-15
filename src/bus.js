@@ -27,7 +27,7 @@ const wrapReduxMiddleware = (mw) => {
   return (send) => (channel, message, source) => {
     const action = Object.assign({}, message, {type: channel, source: source})
     const dispatch = (action) => send(action.type, action)
-    const store = { getState: () => null, dispatch  }
+    const store = { getState: () => null, dispatch }
     const next = () => {}
     mw(store)(next)(action)
   }
