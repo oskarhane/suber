@@ -20,16 +20,19 @@ const sendMessageToSubscribers = (channel, message) => {
 }
 const sendMessageToMiddlewares = (channel, message, source) => {
   middlewares.forEach((mw) => {
-    setTimeout((() => mw(send)(channel, message, source))(mw), 0)
+    setTimeout((() => mw(channel, message, source))(mw), 0)
   })
 }
 const wrapReduxMiddleware = (mw) => {
-  return (send) => (channel, message, source) => {
-    const action = Object.assign({}, message, {type: channel, source: source})
+  return (send) => {
     const dispatch = (action) => send(action.type, action)
     const store = { getState: () => null, dispatch }
-    const next = () => {}
-    mw(store)(next)(action)
+    const partialMw = mw(store)
+    return (channel, message, source) => {
+      const action = Object.assign({}, message, {type: channel, source: source})
+      const next = () => {}
+      partialMw(next)(action)
+    }
   }
 }
 
@@ -58,11 +61,11 @@ export const createReduxMiddleware = () => (next) => (action) => {
   return next(action)
 }
 export function applyMiddleware () {
-  Array.from(arguments).forEach((arg) => middlewares.push(arg))
+  Array.from(arguments).forEach((arg) => middlewares.push(arg(send)))
 }
 export function applyReduxMiddleware () {
   Array.from(arguments).forEach((arg) => {
-    const compat = wrapReduxMiddleware(arg)
+    const compat = wrapReduxMiddleware(arg)(send)
     middlewares.push(compat)
   })
 }
