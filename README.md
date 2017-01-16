@@ -4,6 +4,46 @@ other bus/pubsub systems. For example, Redux to take advantage of the Redux
 ecosystem for handling side effects, but without having to store
 everything in the Redux global store.
 
+## Use cases
+### Stand-alone
+It can be used as the main message bus / event emitter / pubsub
+in an application to keep components separated without any dependencies (except for suber)
+and be able to communicate.
+
+For code testability it's better to have all side effect handlers listening and acting on
+messages on a bus rather than to have async / ajax calls directly in the components.
+With subers Redux middleware compability, great middlewares like
+[redux-observable](https://redux-observable.js.org) and
+[redux-saga](https://redux-saga.github.io/redux-saga/) can be used to handle the side effects.
+
+On the other hand, creating a suber middleware is super easy so having direct
+[fetch](https://developer.mozilla.org/en/docs/Web/API/Fetch_API) calls
+in a self-made middleware is often enough for smaller applications.
+
+### In combination with Redux
+Redux is great for shared application state handling, but often too much state are stored in Redux.
+This makes the reducer and action files big and the amount of boilerplate code needed to
+type increases.
+
+Application state that is not shared should not go into Redux, it should go directly,
+and only into, the component that needs it.
+
+This is where suber comes in.
+
+Setup your Redux middleware side-effect handler to listen for certain action types
+(`GET_USER` in the below example) and pass suber to your component (or have a container component
+handle the calls and pass the response as props to it).
+Your component can now super easy with
+
+```javascript
+bus.one('GOT_USER_1', (r) => this.setState({user: r.user}))
+bus.send('GET_USER', {id: 1})
+```
+
+do a ajax call and set the component state so component can update the DOM can accordingly.
+Now all code with side effects is in the same place no matter if the endpoint for the
+response is Redux or single component state.
+
 ## Installation
 suber is published on npm: https://www.npmjs.com/package/suber
 
@@ -14,7 +54,7 @@ npm install suber
 ```
 
 ## Usage
-Simple standalone usage:
+Stand-alone usage:
 
 ```javascript
 // Import
