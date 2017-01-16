@@ -1,7 +1,7 @@
 {
   "name": "suber",
   "version": "1.0.1",
-  "description": "A global message / event bus prepared for usage in combination with other bus systems",
+  "description": "A message bus / pubsub compatible with Redux middlewares",
   "main": "lib/bus",
   "scripts": {
     "build": "npm run lint && babel src -d lib --ignore \"**/*.test.js\" ",
@@ -19,6 +19,7 @@
   },
   "homepage": "http://oskarhane.com",
   "keywords": [
+    "pubsub",
     "channels",
     "event bus",
     "message bus"
