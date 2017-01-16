@@ -4,18 +4,17 @@ const addChannelSubscriber = (channel, fn, filterFn, once) => {
   const id = nextId++
   const stopFn = createStopFn(channel, id)
   const newFn = once !== true ? fn : (message) => (stopFn() && fn(message))
-  subscriptions[channel][id] = { fn: newFn, filterFn }
+  subscriptions[channel][id] = { fn: newFn, filterFn: (filterFn || (() => true)) }
   return stopFn
 }
 const createStopFn = (channel, id) => () => delete subscriptions[channel][id]
+const getChannelSubscribers = (channel) => {
+  return (Object.keys(subscriptions[channel] || {}) || [])
+                .map((key) => subscriptions[channel][key])
+}
 const sendMessageToSubscribers = (channel, message) => {
-  if (!subscriptions[channel]) return
-  Object.keys(subscriptions[channel]).forEach((key) => {
-    const sub = subscriptions[channel][key]
-    if (sub.filterFn) {
-      if (!sub.filterFn(message)) return
-    }
-    setTimeout(((sub) => sub.fn(message))(sub), 0)
+  getChannelSubscribers('*').concat(getChannelSubscribers(channel)).forEach((sub) => {
+    setTimeout(((sub) => sub.filterFn(message) && sub.fn(message))(sub), 0)
   })
 }
 const sendMessageToMiddlewares = (channel, message, source) => {

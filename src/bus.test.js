@@ -73,6 +73,29 @@ test('can have multiple subscribers for a channel', () => {
   expect(cb3).not.toHaveBeenCalled()
 })
 
+test('can catch all messages with "*" channel', () => {
+  // Given
+  const b = getBus()
+  let cb1 = jest.fn()
+  let cb2 = jest.fn()
+  let catchAllCb = jest.fn()
+  const channel = 'my channel 2'
+  const noSubscriberChannel = 'no direct subscribers'
+  const data = {id: 2}
+
+  // When
+  b.take(channel, cb1)
+  b.take(channel, cb2)
+  b.take('*', catchAllCb)
+  b.send(channel, data)
+  b.send(noSubscriberChannel, data)
+
+  // Then
+  expect(cb1).toHaveBeenCalledWith(data)
+  expect(cb2).toHaveBeenCalledWith(data)
+  expect(catchAllCb).toHaveBeenCalledTimes(2)
+})
+
 test('subscribers filter function', () => {
   // Given
   const b = getBus()
