@@ -55,12 +55,12 @@ const bus = { take, one, send }
 
 // Exported functions
 export const getBus = () => bus
+export function applyMiddleware () {
+  Array.from(arguments).forEach((arg) => middlewares.push(arg(send)))
+}
 export const createReduxMiddleware = () => () => (next) => (action) => {
   bus.send(action.type, action, 'redux')
   return next(action)
-}
-export function applyMiddleware () {
-  Array.from(arguments).forEach((arg) => middlewares.push(arg(send)))
 }
 export function applyReduxMiddleware () {
   Array.from(arguments).forEach((arg) => {
