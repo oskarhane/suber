@@ -4,6 +4,8 @@ other bus/pubsub systems. For example, Redux to take advantage of the Redux
 ecosystem for handling side effects, but without having to store
 everything in the Redux global store.
 
+Because not all things should go in the shared state / Redux.
+
 ## Use cases
 ### Stand-alone
 It can be used as the main message bus / event emitter / pubsub
@@ -22,17 +24,15 @@ in a self-made middleware is often enough for smaller applications.
 
 ### In combination with Redux
 Redux is great for shared application state handling, but often too much state are stored in Redux.
-This makes the reducer and action files big and the amount of boilerplate code needed to
-type increases.
 
 Application state that is not shared should not go into Redux, it should go directly,
 and only into, the component that needs it.
 
 This is where suber comes in.
 
-Setup your Redux middleware side-effect handler to listen for certain action types
-(`GET_USER` in the below example) and pass suber to your component (or have a container component
-handle the calls and pass the response as props to it).
+Setup your existing Redux middleware side-effect handler (like redux-saga, thunks or redux-observable)
+to listen for certain action types (`GET_USER` in the below example) and pass suber to
+your component (or have a container component handle the calls and pass the response as props to it).
 Your component can now super easy with
 
 ```javascript
@@ -40,7 +40,7 @@ bus.one('GOT_USER_1', (r) => this.setState({user: r.user}))
 bus.send('GET_USER', {id: 1})
 ```
 
-do a ajax call and set the component state so component can update the DOM can accordingly.
+do API calls and set the component state so component can update the DOM can accordingly.
 Now all code with side effects is in the same place no matter if the endpoint for the
 response is Redux or single component state.
 
@@ -101,8 +101,7 @@ applySuberMiddleware((_) => (channel, message, source) => {
 
 // Imagine you have redux-saga setup listening for actions
 // with the type: 'GET_USER' and dispatches a new action with
-// type 'GET_USER_RESPONSE_' + responseAction (to make it "random" to allow concurrency)
-// when response arrives from API.
+// type 'GOT_USER_RESPONSE_' + id, when response arrives from API.
 
 // ----
 
@@ -110,17 +109,13 @@ applySuberMiddleware((_) => (channel, message, source) => {
 // React component or anything that has been given access to the suber bus
 // either via direct import or through a jsx property.
 
-// Prepare a somewhat random channel / redux action
-const responseAction = Math.floor(Math.round()*100 + 1)
-
 // Listen for a single message on that channel
-bus.one('GET_USER_RESPONSE_' + responseAction, (data) => {
+bus.one('GOT_USER_RESPONSE_1', (data) => {
   console.log(data)
 })
 
-// Ask for user with id = 1 and tell redux-saga what output
-// type suffix you want the response to have.
-bus.send('GET_USER', {id: 1, responseAction })
+// Ask for user with id = 1
+bus.send('GET_USER', { id: 1 })
 ```
 
 
