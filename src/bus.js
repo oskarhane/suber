@@ -29,7 +29,7 @@ const wrapReduxMiddleware = (mw) => {
     const partialMw = mw(store)
     return (channel, message, source) => {
       const action = Object.assign({}, message, {type: channel, source: source})
-      const next = () => {}
+      const next = (a) => a
       partialMw(next)(action)
     }
   }
