@@ -55,7 +55,7 @@ const bus = { take, one, send }
 
 // Exported functions
 export const getBus = () => bus
-export const createReduxMiddleware = () => (next) => (action) => {
+export const createReduxMiddleware = () => () => (next) => (action) => {
   bus.send(action.type, action, 'redux')
   return next(action)
 }

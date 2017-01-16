@@ -1,5 +1,6 @@
 /* global test, expect, jest */
 import { getBus, createReduxMiddleware, applyReduxMiddleware } from './bus'
+import { createStore, applyMiddleware } from 'redux'
 import 'rxjs'
 import { createEpicMiddleware } from 'redux-observable'
 import createSagaMiddleware from 'redux-saga'
@@ -11,18 +12,18 @@ test('can create a redux middleware that repeats all redux actions into bus', ()
   let cb = jest.fn()
   const channel = 'FROM_REDUX'
   const data = {id: 10, type: channel}
-  const reduxAction = data
-  const reduxNext = jest.fn()
-  const reduxFn = (mw) => mw(reduxNext)(reduxAction)
   const mw = createReduxMiddleware()
 
   // When
   b.take(channel, cb)
-  reduxFn(mw) // Fake call from redux
+  let store = createStore(
+    (a) => a,
+    applyMiddleware(mw)
+  )
+  store.dispatch(data)
 
   // Then
   expect(cb).toHaveBeenCalledWith(data)
-  expect(reduxNext).toHaveBeenCalledWith(data)
 })
 
 test('exposes applyReduxMiddleware with same mw signature as redux', () => {
