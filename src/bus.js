@@ -2,12 +2,12 @@
 const addChannelSubscriber = (channel, fn, filterFn, once) => {
   subscriptions[channel] = subscriptions[channel] || {}
   const id = nextId++
-  const unsub = createUnsub(channel, id)
-  const newFn = once !== true ? fn : (message) => (unsub() && fn(message))
+  const stopFn = createStopFn(channel, id)
+  const newFn = once !== true ? fn : (message) => (stopFn() && fn(message))
   subscriptions[channel][id] = { fn: newFn, filterFn }
-  return unsub
+  return stopFn
 }
-const createUnsub = (channel, id) => () => delete subscriptions[channel][id]
+const createStopFn = (channel, id) => () => delete subscriptions[channel][id]
 const sendMessageToSubscribers = (channel, message) => {
   if (!subscriptions[channel]) return
   Object.keys(subscriptions[channel]).forEach((key) => {
