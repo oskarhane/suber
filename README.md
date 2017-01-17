@@ -1,13 +1,100 @@
-# suber - a message bus compatible with Redux middlewares
-A message bus / pubsub prepared for usage in combination with
-other bus/pubsub systems. For example, Redux to take advantage of the Redux
-ecosystem for handling side effects, but without having to store
-everything in the Redux global store.
+<p align="center">
+  <b>Suber</b>
+  <br>
+  - <i>A message bus / pubsub compatible with Redux middlewares</i> -
+  <br>
+  <br>
+  <a href="https://www.npmjs.com/package/suber">
+    <img src="https://img.shields.io/npm/v/suber.svg?style=flat" alt="npm">
+  </a>
+  <a href="https://travis-ci.org/oskarhane/suber">
+    <img src="https://travis-ci.org/oskarhane/suber.svg?branch=master" alt="travis">
+  </a>
+</p>
 
-Because not all things should go in the shared state / Redux.
+## Why Suber?
+
+- **Tiny:** weighs ≈ 1kb gzipped
+- **Compatible:** Works with popular side effects handling middlewares like redux-saga and redux-observable
+- **Extensible:** Easily create middleware to extend it
+- **No dependencies:** No dependencies, just 67 lines of code
+
+## Usage
+
+Install:
+
+```bash
+yarn add suber
+# or
+npm install suber --save
+```
+
+Regular usage:
+
+```javascript
+// Import
+import { getBus } from 'suber'
+
+const bus = getBus()
+
+// Listen for a message until manual unsubscription
+const unsub = bus.take('MY_CHANNEL', (msg) => {
+  console.log(msg.title)
+})
+// or just one (unsubscribes automatically)
+bus.one('MY_CHANNEL', (msg) => {
+  console.log(msg.title)
+})
+
+// Send a message / data
+bus.send('MY_CHANNEL', { title: 'Hello World' })
+```
+
+Usage in combination with Redux:
+
+```javascript
+// app.js
+// App init file
+import { applyMiddleware as applySuberMiddleware, createReduxMiddleWare } from 'suber'
+import { createStore, applyMiddleware } from 'redux'
+
+// Init
+const mw = createReduxMiddleWare()
+// Next line enables sending actions from Redux into suber
+let store = createStore(
+  yourApp,
+  applyMiddleware(mw) // combine with your other middlewares
+)
+
+// Send everything from suber into Redux
+applySuberMiddleware((_) => (channel, message, source) => {
+  // No loop-backs
+  if (source === 'redux') return
+  // Send to Redux with the channel as the action type
+  store.dispatch({...message, type: channel})
+})
+
+// Imagine you have redux-saga setup listening for actions
+// with the type: 'GET_USER' and dispatches a new action with
+// type 'GOT_USER_RESPONSE_' + id, when response arrives from API.
+
+// ----
+
+// component.js
+// React component or anything that has been given access to the suber bus
+// either via direct import or through a jsx property.
+
+// Listen for a single message on that channel
+bus.one('GOT_USER_RESPONSE_1', (data) => {
+  console.log(data)
+})
+
+// Send message to redux-saga to fetch user with id = 1
+bus.send('GET_USER', { id: 1 })
+```
 
 ## Use cases
-### Stand-alone
+### Regular
 It can be used as the main message bus / event emitter / pubsub
 in an application to keep components separated without any dependencies (except for suber)
 and be able to communicate.
@@ -43,81 +130,6 @@ bus.send('GET_USER', {id: 1})
 do API calls and set the component state so component can update the DOM can accordingly.
 Now all code with side effects is in the same place no matter if the endpoint for the
 response is Redux or single component state.
-
-## Installation
-suber is published on npm: https://www.npmjs.com/package/suber
-
-```bash
-yarn add suber
-# or
-npm install suber
-```
-
-## Usage
-Stand-alone usage:
-
-```javascript
-// Import
-import { getBus } from 'suber'
-
-// Get bus
-const bus = getBus()
-
-// Listen until manual unsubscription
-const unsub = bus.take('MY_CHANNEL', (data) => {
-  console.log(data)
-})
-// or just one (unsubscribes automatically)
-bus.one('MY_CHANNEL', (data) => {
-  console.log(data)
-})
-
-// Send
-bus.send('MY_CHANNEL', 'Hello world')
-```
-
-Usage with Redux.
-This way we can use local state only but still take advantage of
-the Redux ecosystem of great middlewares.
-
-```javascript
-// app.js
-// App init file
-import { applyMiddleware as applySuberMiddleware, createReduxMiddleWare } from 'suber'
-import { createStore, applyMiddleware } from 'redux'
-
-// Init
-const mw = createReduxMiddleWare()
-// Next line enables sending actions from Redux into suber
-let store = createStore(yourApp, applyMiddleware(mw))
-
-// Send everything from suber into Redux
-applySuberMiddleware((_) => (channel, message, source) => {
-  // No loop-backs
-  if (source === 'redux') return
-  // Send to Redux with the channel as the action type
-  store.dispatch({...message, type: channel})
-})
-
-// Imagine you have redux-saga setup listening for actions
-// with the type: 'GET_USER' and dispatches a new action with
-// type 'GOT_USER_RESPONSE_' + id, when response arrives from API.
-
-// ----
-
-// component.js
-// React component or anything that has been given access to the suber bus
-// either via direct import or through a jsx property.
-
-// Listen for a single message on that channel
-bus.one('GOT_USER_RESPONSE_1', (data) => {
-  console.log(data)
-})
-
-// Ask for user with id = 1
-bus.send('GET_USER', { id: 1 })
-```
-
 
 ## API
 ### Factory
@@ -205,5 +217,5 @@ suber.send(redux.action.type, redux.action, 'redux')
 
 ```bash
 yarn
-npm test
+npm run dev
 ```
