@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run lint && babel src -d lib --ignore \"**/*.test.js\" ",
     "lint": "standard --fix",
-    "test": "jest",
+    "test": "npm run lint && jest",
     "dev": "jest --watch",
     "prepublish": "npm run build"
   },

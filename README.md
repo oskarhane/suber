@@ -14,6 +14,7 @@
 
 ## Why Suber?
 
+- **Helpful:** Decouples your application modules / components which improves testability
 - **Tiny:** weighs ≈ 1kb gzipped
 - **Compatible:** Works with popular side effects handling middlewares like redux-saga and redux-observable
 - **Extensible:** Easily create middleware to extend it
@@ -153,6 +154,7 @@ Returns the singleton bus.
 
 ## Methods
 These are methods that are attached to the bus instance.
+
 ### <a id="take"></a> `take(channel, fn, filterFn)`
 Sets up a listener on the bus and calls `fn` every time a message with a matching `channel` arrives.
 #### Arguments
