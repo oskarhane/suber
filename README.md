@@ -1,7 +1,7 @@
 <p align="center">
   <b>Suber</b>
   <br>
-  - <i>A message bus / pubsub compatible with Redux middlewares</i> -
+  - <i>eventbus / pubsub compatible with Redux middlewares</i> -
   <br>
   <br>
   <a href="https://www.npmjs.com/package/suber">
@@ -96,7 +96,7 @@ bus.send('GET_USER', { id: 1 })
 
 ## Use cases
 ### Regular
-It can be used as the main message bus / event emitter / pubsub
+It can be used as the main eventbus / pubsub
 in an application to keep components separated without any dependencies (except for suber)
 and be able to communicate.
 
