@@ -1,4 +1,6 @@
 <p align="center">
+  <img src="https://i.imgur.com/yXodrdT.png" width="256" height="256" alt="suber logo">
+  <br>
   <b>Suber</b>
   <br>
   - <i>eventbus / pubsub compatible with Redux middlewares</i> -
