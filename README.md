@@ -146,6 +146,7 @@ response is Redux or single component state.
 
 ### Utility functions
 - [`applyMiddleware`](#applyMiddleware)
+- [`resetMiddlewares`](#resetMiddlewares)
 - [`applyReduxMiddleware`](#applyReduxMiddleware)
 - [`createReduxMiddleWare`](#createReduxMiddleWare)
 
@@ -188,6 +189,13 @@ Functions to configure or extend the bus.
 Add middleware to Suber. All messages on all channels gets passed to the middleware.
 #### Arguments
 - `fn: Function(channel, message, source)` The function to be called with every message on the bus.
+
+#### Returns `void`
+
+### <a id="resetMiddlewares"></a> `resetMiddlewares(fn)`
+Removes all active all middlewares.
+#### Arguments
+- No arguments
 
 #### Returns `void`
 

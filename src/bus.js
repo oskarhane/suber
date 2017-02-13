@@ -50,7 +50,7 @@ const send = (channel, message, source = 'app') => {
 // Local variables / constants
 let nextId = 0
 const subscriptions = {}
-const middlewares = []
+let middlewares = []
 const bus = { take, one, send }
 
 // Exported functions
@@ -67,5 +67,8 @@ export function applyReduxMiddleware () {
     const compat = wrapReduxMiddleware(arg)(send)
     middlewares.push(compat)
   })
+}
+export const resetMiddlewares = () => {
+  middlewares = []
 }
 
