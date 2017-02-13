@@ -37,6 +37,7 @@ const wrapReduxMiddleware = (mw) => {
 }
 
 // Exposed bus methods
+const reset = () => Object.keys(subscriptions).forEach((key) => delete subscriptions[key])
 const take = (channel, fn, filterFn = null, once = false) => {
   if (!channel || !fn) return false
   return addChannelSubscriber(channel, fn, filterFn, once)
@@ -57,7 +58,7 @@ const _self = (channel, message, fn) => {
 let nextId = 0
 const subscriptions = {}
 let middlewares = []
-const bus = { take, one, send, self: _self }
+const bus = { take, one, send, reset, self: _self }
 
 // Exported functions
 export const getBus = () => bus

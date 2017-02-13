@@ -144,6 +144,7 @@ response is Redux or single component state.
 - [`one`](#one)
 - [`send`](#send)
 - [`self`](#self)
+- [`reset`](#reset)
 
 ### Utility functions
 - [`applyMiddleware`](#applyMiddleware)
@@ -198,6 +199,14 @@ subscriber to respond on. See tests file for an example.
 
 #### Returns `void`
 
+### <a id="reset"></a> `reset()`
+Removes all subscribers on all channels.
+
+#### Arguments
+_No arguments_
+
+#### Returns `void`
+
 ## Utility functions
 Functions to configure or extend the bus.
 
@@ -213,7 +222,7 @@ Add middleware to Suber. All messages on all channels gets passed to the middlew
 Removes all active all middlewares.
 
 #### Arguments
-- No arguments
+_No arguments_
 
 #### Returns `void`
 
