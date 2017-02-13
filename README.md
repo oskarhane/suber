@@ -143,6 +143,7 @@ response is Redux or single component state.
 - [`take`](#take)
 - [`one`](#one)
 - [`send`](#send)
+- [`self`](#self)
 
 ### Utility functions
 - [`applyMiddleware`](#applyMiddleware)
@@ -161,6 +162,7 @@ These are methods that are attached to the bus instance.
 
 ### <a id="take"></a> `take(channel, fn, filterFn)`
 Sets up a listener on the bus and calls `fn` every time a message with a matching `channel` arrives.
+
 #### Arguments
 - `channel: String` What channel to listen on the bus.
 - `fn: Function(message)` The function to call when a message on the channel arrives.
@@ -175,6 +177,7 @@ Just like `take` above but with automatic unsubscription after the first message
 
 ### <a id="send"></a> `send(channel, message, source)`
 Send a message on a channel on the bus.
+
 #### Arguments
 - `channel: String` The channel to send the message on.
 - `message: any` The message, can be of any data type.
@@ -183,10 +186,24 @@ Best used when `applyMiddleware` and `createReduxMiddleWare` both are specified 
 
 #### Returns `void`
 
+### <a id="self"></a> `self(channel, message, fn)`
+Send a message on a channel and expect the receiver of the message to reply back to you.
+A property (named `_responseChannel`) is automatically added to the message for the
+subscriber to respond on. See tests file for an example.
+
+#### Arguments
+- `channel: String` The channel to send the message on.
+- `message: any` The message, can be of any data type.
+- `fn: Function` Function to be called with the response from the subscriber.
+
+#### Returns `void`
+
 ## Utility functions
 Functions to configure or extend the bus.
+
 ### <a id="applyMiddleware"></a> `applyMiddleware(fn)`
 Add middleware to Suber. All messages on all channels gets passed to the middleware.
+
 #### Arguments
 - `fn: Function(channel, message, source)` The function to be called with every message on the bus.
 
@@ -194,6 +211,7 @@ Add middleware to Suber. All messages on all channels gets passed to the middlew
 
 ### <a id="resetMiddlewares"></a> `resetMiddlewares(fn)`
 Removes all active all middlewares.
+
 #### Arguments
 - No arguments
 
@@ -205,6 +223,7 @@ handling side effects like redux-saga and redux-observable can be used without
 Redux.
 The params for `store.getState` and `next` are unsuable, so middlewares that rely on
 these will not be compatible since Suber isn't about state / reducers.
+
 #### Arguments
 - `rmw: Function()` The Redux middleware with `(store) => (next) => (action) => ` signature.
 
