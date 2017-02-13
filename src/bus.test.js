@@ -1,5 +1,5 @@
 /* global test, expect, jest */
-import { getBus, applyMiddleware } from './bus'
+import { getBus, applyMiddleware, resetMiddlewares } from './bus'
 
 test('can get the bus', () => {
   // Given
@@ -157,4 +157,32 @@ test('exposes applyMiddleware', () => {
   // Then
   expect(cb).toHaveBeenCalledWith(data)
   expect(myInnerMw).toHaveBeenCalledWith(channel, data, source)
+})
+
+test('exposes setMiddleware', () => {
+  // Given
+  const b = getBus()
+  let cb = jest.fn()
+  let myInnerMw = jest.fn()
+  let myMw = (send) => myInnerMw
+  const channel = 'emitSubject'
+  const data = {id: 10}
+  const source = 'test'
+
+  // When
+  b.take(channel, cb)
+  applyMiddleware(myMw)
+  b.send(channel, data, source)
+
+  // Then
+  expect(cb).toHaveBeenCalledWith(data)
+  expect(myInnerMw).toHaveBeenCalledWith(channel, data, source)
+
+  // When
+  resetMiddlewares()
+  b.send(channel, data, source)
+
+  // Then
+  expect(cb).toHaveBeenCalledTimes(2)
+  expect(myInnerMw).toHaveBeenCalledTimes(1)
 })
