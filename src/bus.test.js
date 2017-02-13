@@ -73,6 +73,26 @@ test('can have multiple subscribers for a channel', () => {
   expect(cb3).not.toHaveBeenCalled()
 })
 
+test('self passes on `responseChannel` to tell subs where to respond', () => {
+  // Given
+  const b = getBus()
+  let cb = jest.fn()
+  const data = {id: 1}
+  const data2 = {id: 2}
+  const cb2 = (data) => {
+    b.send(data.responseChannel, data2)
+  }
+  const channel = 'my channel'
+
+  // When
+  b.take(channel, cb2)
+  b.self(channel, data, cb)
+
+  // Then
+  expect(cb).toHaveBeenCalledTimes(1)
+  expect(cb).toHaveBeenCalledWith(data2)
+})
+
 test('can catch all messages with "*" channel', () => {
   // Given
   const b = getBus()
