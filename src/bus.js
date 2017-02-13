@@ -1,7 +1,8 @@
 // Private utility functions
+const getId = () => nextId++
 const addChannelSubscriber = (channel, fn, filterFn, once) => {
   subscriptions[channel] = subscriptions[channel] || {}
-  const id = nextId++
+  const id = getId()
   const stopFn = createStopFn(channel, id)
   const newFn = once !== true ? fn : (message) => (stopFn() && fn(message))
   subscriptions[channel][id] = { fn: newFn, filterFn: (filterFn || (() => true)) }
@@ -46,12 +47,17 @@ const send = (channel, message, source = 'app') => {
   sendMessageToSubscribers(channel, message)
   sendMessageToMiddlewares(channel, message, source)
 }
+const _self = (channel, message, fn) => {
+  const _responseChannel = 'SELF_REF_' + getId()
+  one(_responseChannel, fn)
+  send(channel, Object.assign({}, message, { _responseChannel }))
+}
 
 // Local variables / constants
 let nextId = 0
 const subscriptions = {}
 let middlewares = []
-const bus = { take, one, send }
+const bus = { take, one, send, self: _self }
 
 // Exported functions
 export const getBus = () => bus
