@@ -209,7 +209,7 @@ Add middleware to Suber. All messages on all channels gets passed to the middlew
 
 #### Returns `void`
 
-### <a id="resetMiddlewares"></a> `resetMiddlewares(fn)`
+### <a id="resetMiddlewares"></a> `resetMiddlewares()`
 Removes all active all middlewares.
 
 #### Arguments
