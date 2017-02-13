@@ -80,7 +80,7 @@ test('self passes on `responseChannel` to tell subs where to respond', () => {
   const data = {id: 1}
   const data2 = {id: 2}
   const cb2 = (data) => {
-    b.send(data.responseChannel, data2)
+    b.send(data._responseChannel, data2)
   }
   const channel = 'my channel'
 

@@ -48,9 +48,9 @@ const send = (channel, message, source = 'app') => {
   sendMessageToMiddlewares(channel, message, source)
 }
 const _self = (channel, message, fn) => {
-  const responseChannel = 'SELF_REF_' + getId()
-  one(responseChannel, fn)
-  send(channel, Object.assign({}, message, { responseChannel }))
+  const _responseChannel = 'SELF_REF_' + getId()
+  one(_responseChannel, fn)
+  send(channel, Object.assign({}, message, { _responseChannel }))
 }
 
 // Local variables / constants
