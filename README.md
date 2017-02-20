@@ -20,7 +20,7 @@
 - **Tiny:** weighs ≈ 1kb gzipped
 - **Compatible:** Works with popular side effects handling middlewares like redux-saga and redux-observable
 - **Extensible:** Easily create middleware to extend it
-- **No dependencies:** No dependencies, just 67 lines of code
+- **No dependencies:** No dependencies, it's less than 100 lines of code
 - **React bindings:** See [react-suber](https://github.com/oskarhane/react-suber) for React binding
 
 ## Usage
