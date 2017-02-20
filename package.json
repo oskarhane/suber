@@ -1,6 +1,6 @@
 {
   "name": "suber",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A message bus / pubsub compatible with Redux middlewares",
   "main": "lib/bus",
   "scripts": {
