@@ -5,6 +5,7 @@ import 'rxjs'
 import { createEpicMiddleware } from 'redux-observable'
 import createSagaMiddleware from 'redux-saga'
 import { put, takeLatest } from 'redux-saga/effects'
+import configureMockStore from 'redux-mock-store'
 
 test('can create a redux middleware that repeats all redux actions into bus', () => {
   // Given
@@ -24,6 +25,28 @@ test('can create a redux middleware that repeats all redux actions into bus', ()
 
   // Then
   expect(cb).toHaveBeenCalledWith(data)
+})
+
+test('can create a redux middleware that let actions go to redux store before sending to suber', (done) => {
+  // Given
+  const b = getBus()
+  const channel = 'FROM_MOCK_REDUX'
+  const data = {id: 10, type: channel}
+  const mw = createReduxMiddleware()
+  const mockStore = configureMockStore([mw])
+  const store = mockStore({
+    state: {}
+  })
+
+  // When
+  b.take(channel, (action) => {
+    // Then
+    expect(store.getActions()).toEqual([
+      data
+    ])
+    done()
+  })
+  store.dispatch(data)
 })
 
 test('exposes applyReduxMiddleware with same mw signature as redux', () => {
