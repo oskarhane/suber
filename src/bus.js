@@ -66,8 +66,9 @@ export function applyMiddleware () {
   Array.from(arguments).forEach((arg) => middlewares.push(arg(send)))
 }
 export const createReduxMiddleware = () => () => (next) => (action) => {
+  const res = next(action)
   bus.send(action.type, action, 'redux')
-  return next(action)
+  return res
 }
 export function applyReduxMiddleware () {
   Array.from(arguments).forEach((arg) => {
