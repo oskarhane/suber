@@ -15,12 +15,12 @@ const getChannelSubscribers = (channel) => {
 }
 const sendMessageToSubscribers = (channel, message) => {
   getChannelSubscribers('*').concat(getChannelSubscribers(channel)).forEach((sub) => {
-    setTimeout(((sub) => sub.filterFn(message) && sub.fn(message))(sub), 0)
+    sub.filterFn(message) && sub.fn(message)
   })
 }
 const sendMessageToMiddlewares = (channel, message, source) => {
   middlewares.forEach((mw) => {
-    setTimeout((() => mw(channel, message, source))(mw), 0)
+    mw(channel, message, source)
   })
 }
 const wrapReduxMiddleware = (mw) => {
