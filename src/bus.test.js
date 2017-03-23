@@ -1,11 +1,10 @@
 /* global describe, beforeEach, test, expect, jest */
-import { getBus, applyMiddleware, resetMiddlewares } from './bus'
+import { createBus } from './bus'
 
 describe('Suber core testing', () => {
   let b = null
   beforeEach(() => {
-    b = getBus()
-    b.reset()
+    b = createBus()
   })
 
   test('can send messages on the bus', () => {
@@ -70,7 +69,7 @@ describe('Suber core testing', () => {
 
   test('self passes on `_responseChannel` to tell subs where to respond', () => {
     // Given
-    const b = getBus()
+    const b = createBus()
     let cb = jest.fn()
     const data = {id: 1}
     const data2 = {id: 2}
@@ -171,12 +170,31 @@ describe('Suber core testing', () => {
     //
     expect(cb).toHaveBeenCalledTimes(1)
   })
+  test('bus is not global', () => {
+    // Given
+    const b = createBus()
+    const c = createBus()
+    let cb = jest.fn()
+    let cb2 = jest.fn()
+    const data = {id: 1}
+    const channel = 'my channel'
+
+    // When
+    b.take(channel, cb)
+    c.take(channel, cb2)
+    b.send(channel, data)
+
+    // Then
+    expect(cb).toHaveBeenCalledTimes(1)
+    expect(cb).toHaveBeenCalledWith(data)
+    expect(cb2).toHaveBeenCalledTimes(0)
+  })
 })
 
 describe('Utility functions', () => {
   let b = null
   beforeEach(() => {
-    b = getBus()
+    b = createBus()
     b.reset()
   })
   test('exposes applyMiddleware', () => {
@@ -190,7 +208,7 @@ describe('Utility functions', () => {
 
     // When
     b.take(channel, cb)
-    applyMiddleware(myMw)
+    b.applyMiddleware(myMw)
     b.send(channel, data, source)
 
     // Then
@@ -199,7 +217,7 @@ describe('Utility functions', () => {
   })
   test('exposes resetMiddlewares', () => {
     // Given
-    const b = getBus()
+    const b = createBus()
     let cb = jest.fn()
     let myInnerMw = jest.fn()
     let myMw = (send) => myInnerMw
@@ -209,7 +227,7 @@ describe('Utility functions', () => {
 
     // When
     b.take(channel, cb)
-    applyMiddleware(myMw)
+    b.applyMiddleware(myMw)
     b.send(channel, data, source)
 
     // Then
@@ -217,7 +235,7 @@ describe('Utility functions', () => {
     expect(myInnerMw).toHaveBeenCalledWith(channel, data, source)
 
     // When
-    resetMiddlewares()
+    b.resetMiddlewares()
     b.send(channel, data, source)
 
     // Then

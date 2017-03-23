@@ -1,5 +1,5 @@
 /* global test, expect, jest */
-import { getBus, createReduxMiddleware, applyReduxMiddleware } from './bus'
+import { createBus } from './bus'
 import { createStore, applyMiddleware } from 'redux'
 import 'rxjs'
 import { createEpicMiddleware } from 'redux-observable'
@@ -9,11 +9,11 @@ import configureMockStore from 'redux-mock-store'
 
 test('can create a redux middleware that repeats all redux actions into bus', () => {
   // Given
-  const b = getBus()
+  const b = createBus()
   let cb = jest.fn()
   const channel = 'FROM_REDUX'
   const data = {id: 10, type: channel}
-  const mw = createReduxMiddleware()
+  const mw = b.createReduxMiddleware()
 
   // When
   b.take(channel, cb)
@@ -29,10 +29,10 @@ test('can create a redux middleware that repeats all redux actions into bus', ()
 
 test('can create a redux middleware that let actions go to redux store before sending to suber', (done) => {
   // Given
-  const b = getBus()
+  const b = createBus()
   const channel = 'FROM_MOCK_REDUX'
   const data = {id: 10, type: channel}
-  const mw = createReduxMiddleware()
+  const mw = b.createReduxMiddleware()
   const mockStore = configureMockStore([mw])
   const store = mockStore({
     state: {}
@@ -49,9 +49,9 @@ test('can create a redux middleware that let actions go to redux store before se
   store.dispatch(data)
 })
 
-test('exposes applyReduxMiddleware with same mw signature as redux', () => {
+test('exposes b.applyReduxMiddleware with same mw signature as redux', () => {
   // Given
-  const b = getBus()
+  const b = createBus()
   let cb = jest.fn()
   const channel = 'TO_REDUX_MW'
   const data = {id: 10}
@@ -69,7 +69,7 @@ test('exposes applyReduxMiddleware with same mw signature as redux', () => {
   }
 
   // When
-  applyReduxMiddleware(mw)
+  b.applyReduxMiddleware(mw)
   b.take(channel, cb)
   b.send(channel, data)
 
@@ -80,7 +80,7 @@ test('exposes applyReduxMiddleware with same mw signature as redux', () => {
 
 test('works with redux-observable', () => {
   // Given
-  const b = getBus()
+  const b = createBus()
   let cb = jest.fn()
   const PING = 'PING'
   const PONG = 'PONG'
@@ -90,7 +90,7 @@ test('works with redux-observable', () => {
   const epicMiddleware = createEpicMiddleware(pingEpic)
 
   // When
-  applyReduxMiddleware(epicMiddleware)
+  b.applyReduxMiddleware(epicMiddleware)
   b.take(PONG, cb)
   b.send(PING)
 
@@ -100,7 +100,7 @@ test('works with redux-observable', () => {
 
 test('works with redux-saga', () => {
   // Given
-  const b = getBus()
+  const b = createBus()
   let cb = jest.fn()
   const PING = 'PING2'
   const PONG = 'PONG2'
@@ -113,7 +113,7 @@ test('works with redux-saga', () => {
   const sagaMiddleware = createSagaMiddleware()
 
   // When
-  applyReduxMiddleware(sagaMiddleware)
+  b.applyReduxMiddleware(sagaMiddleware)
   sagaMiddleware.run(mySaga)
   b.take(PONG, cb)
   b.send(PING)
