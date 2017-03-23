@@ -21,7 +21,7 @@
 - **Compatible:** Works with popular side effects handling middlewares like redux-saga and redux-observable
 - **Extensible:** Easily create middleware to extend it
 - **No dependencies:** No dependencies, it's less than 100 lines of code
-- **React bindings:** See [react-suber](https://github.com/oskarhane/react-suber) for React binding
+- **Framework bindings:** See [react-suber](https://github.com/oskarhane/react-suber) for React binding and [preact-suber](https://github.com/oskarhane/react-suber/tree/preact) for Preact binding
 
 ## Usage
 
@@ -37,9 +37,9 @@ Regular usage:
 
 ```javascript
 // Import
-import { getBus } from 'suber'
+import { createBus } from 'suber'
 
-const bus = getBus()
+const bus = createBus()
 
 // Listen for a message until manual unsubscription
 const unsub = bus.take('MY_CHANNEL', (msg) => {
@@ -59,19 +59,21 @@ Usage in combination with Redux:
 ```javascript
 // app.js
 // App init file
-import { applyMiddleware as applySuberMiddleware, createReduxMiddleWare } from 'suber'
+import { createBus, createReduxMiddleware } from 'suber'
 import { createStore, applyMiddleware } from 'redux'
 
 // Init
-const mw = createReduxMiddleWare()
+const bus = createBus()
+const mw = createReduxMiddleware(bus)
+
 // Next line enables sending actions from Redux into suber
-let store = createStore(
+const store = createStore(
   yourApp,
   applyMiddleware(mw) // combine with your other middlewares
 )
 
 // Send everything from suber into Redux
-applySuberMiddleware((_) => (channel, message, source) => {
+bus.applyMiddleware((_) => (channel, message, source) => {
   // No loop-backs
   if (source === 'redux') return
   // Send to Redux with the channel as the action type
@@ -86,7 +88,8 @@ applySuberMiddleware((_) => (channel, message, source) => {
 
 // component.js
 // React component or anything that has been given access to the suber bus
-// either via direct import or through a jsx property.
+// either via suber bindings like 'react-suber' or 'preact-suber'
+// or through a jsx property.
 
 // Listen for a single message on that channel
 bus.one('GOT_USER_RESPONSE_1', (data) => {
@@ -137,7 +140,7 @@ response is Redux or single component state.
 
 ## API
 ### Factory
-- [`getBus`](#getBus)
+- [`createBus`](#createBus)
 
 ### Methods
 - [`take`](#take)
@@ -145,18 +148,18 @@ response is Redux or single component state.
 - [`send`](#send)
 - [`self`](#self)
 - [`reset`](#reset)
-
-### Utility functions
 - [`applyMiddleware`](#applyMiddleware)
 - [`resetMiddlewares`](#resetMiddlewares)
 - [`applyReduxMiddleware`](#applyReduxMiddleware)
-- [`createReduxMiddleWare`](#createReduxMiddleWare)
+
+### Utility functions
+- [`createReduxMiddleware`](#createReduxMiddleware)
 
 ## Factory
 Factories are functions that returns you the bus.
 
-### <a id="getBus"></a> `getBus()`
-Returns the singleton bus.
+### <a id="createBus"></a> `createBus()`
+Creates and returns a new bus instance. This is **NOT** a global singleton anymore.
 
 ## Methods
 These are methods that are attached to the bus instance.
@@ -183,7 +186,7 @@ Send a message on a channel on the bus.
 - `channel: String` The channel to send the message on.
 - `message: any` The message, can be of any data type.
 - `source: String` Optional argument to specify the message source.
-Best used when `applyMiddleware` and `createReduxMiddleWare` both are specified to avoid loop-backs.
+Best used when `applyMiddleware` and `createReduxMiddleware` both are specified to avoid loop-backs.
 
 #### Returns `void`
 
@@ -206,9 +209,6 @@ Removes all subscribers on all channels.
 _No arguments_
 
 #### Returns `void`
-
-## Utility functions
-Functions to configure or extend the bus.
 
 ### <a id="applyMiddleware"></a> `applyMiddleware(fn)`
 Add middleware to Suber. All messages on all channels gets passed to the middleware.
@@ -238,9 +238,12 @@ these will not be compatible since Suber isn't about state / reducers.
 
 #### Returns `void`
 
-### <a id="createReduxMiddleWare"></a> `createReduxMiddleWare()`
-Creates a function that has the redux middleware signature. This function repeats everything on
-the Redux bus into the suber bus. Redux action types are mapped to be suber channels.
+## Utility functions
+Functions to configure or extend the bus.
+
+### <a id="createReduxMiddleware"></a> `createReduxMiddleware(bus)`
+Creates a function that has the redux middleware signature. This function repeats everything on the Redux bus into the passed in Suber bus.
+Redux action types are mapped to be suber channels.
 
 ```javascript
 redux.action = {
@@ -251,6 +254,9 @@ redux.action = {
 // becomes
 suber.send(redux.action.type, redux.action, 'redux')
 ```
+
+#### Arguments
+- `bus: Object` A Suber bus instance gotten from `createBus()`.
 
 #### Returns `Function` to be passed into Redux's `applyMiddleware`
 
