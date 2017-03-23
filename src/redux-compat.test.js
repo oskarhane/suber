@@ -1,5 +1,5 @@
 /* global test, expect, jest */
-import { createBus } from './bus'
+import { createBus, createReduxMiddleware } from './bus'
 import { createStore, applyMiddleware } from 'redux'
 import 'rxjs'
 import { createEpicMiddleware } from 'redux-observable'
@@ -13,7 +13,7 @@ test('can create a redux middleware that repeats all redux actions into bus', ()
   let cb = jest.fn()
   const channel = 'FROM_REDUX'
   const data = {id: 10, type: channel}
-  const mw = b.createReduxMiddleware()
+  const mw = createReduxMiddleware(b)
 
   // When
   b.take(channel, cb)
@@ -32,7 +32,7 @@ test('can create a redux middleware that let actions go to redux store before se
   const b = createBus()
   const channel = 'FROM_MOCK_REDUX'
   const data = {id: 10, type: channel}
-  const mw = b.createReduxMiddleware()
+  const mw = createReduxMiddleware(b)
   const mockStore = configureMockStore([mw])
   const store = mockStore({
     state: {}

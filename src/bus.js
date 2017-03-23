@@ -68,11 +68,6 @@ export const createBus = () => {
     applyMiddleware: function () {
       Array.from(arguments).forEach((arg) => middlewares.push(arg(send)))
     },
-    createReduxMiddleware: () => () => (next) => (action) => {
-      const res = next(action)
-      send(action.type, action, 'redux')
-      return res
-    },
     applyReduxMiddleware: function () {
       Array.from(arguments).forEach((arg) => {
         const compat = wrapReduxMiddleware(arg)(send)
@@ -83,5 +78,10 @@ export const createBus = () => {
       middlewares = []
     }
   }
+}
+export const createReduxMiddleware = (bus) => () => (next) => (action) => {
+  const res = next(action)
+  bus.send(action.type, action, 'redux')
+  return res
 }
 
