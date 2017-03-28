@@ -192,7 +192,7 @@ Best used when `applyMiddleware` and `createReduxMiddleware` both are specified 
 
 ### <a id="self"></a> `self(channel, message, fn)`
 Send a message on a channel and expect the receiver of the message to reply back to you.
-A property (named `_responseChannel`) is automatically added to the message for the
+A property (named `$$responseChannel`) is automatically added to the message for the
 subscriber to respond on. See tests file for an example.
 
 #### Arguments

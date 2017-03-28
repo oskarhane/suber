@@ -48,9 +48,9 @@ export const createBus = () => {
     sendMessageToMiddlewares(channel, message, source)
   }
   const _self = (channel, message, fn) => {
-    const _responseChannel = 'SELF_REF_' + getId()
-    one(_responseChannel, fn)
-    send(channel, Object.assign({}, message, { _responseChannel }))
+    const $$responseChannel = 'SELF_REF_' + getId()
+    one($$responseChannel, fn)
+    send(channel, Object.assign({}, message, { $$responseChannel }))
   }
 
   // Local variables / constants
