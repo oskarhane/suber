@@ -213,7 +213,9 @@ describe('Utility functions', () => {
 
     // Then
     expect(cb).toHaveBeenCalledWith(data)
+    expect(cb).toHaveBeenCalledTimes(1)
     expect(myInnerMw).toHaveBeenCalledWith(channel, data, source)
+    expect(myInnerMw).toHaveBeenCalledTimes(1)
   })
   test('exposes resetMiddlewares', () => {
     // Given

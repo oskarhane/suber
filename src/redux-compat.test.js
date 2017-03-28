@@ -25,6 +25,7 @@ test('can create a redux middleware that repeats all redux actions into bus', ()
 
   // Then
   expect(cb).toHaveBeenCalledWith(data)
+  expect(cb).toHaveBeenCalledTimes(1)
 })
 
 test('can create a redux middleware that let actions go to redux store before sending to suber', (done) => {
