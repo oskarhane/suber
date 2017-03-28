@@ -192,7 +192,7 @@ Best used when `applyMiddleware` and `createReduxMiddleware` both are specified 
 
 ### <a id="self"></a> `self(channel, message, fn)`
 Send a message on a channel and expect the receiver of the message to reply back to you.
-A property (named `_responseChannel`) is automatically added to the message for the
+A property (named `$$responseChannel`) is automatically added to the message for the
 subscriber to respond on. See tests file for an example.
 
 #### Arguments
@@ -212,9 +212,11 @@ _No arguments_
 
 ### <a id="applyMiddleware"></a> `applyMiddleware(fn)`
 Add middleware to Suber. All messages on all channels gets passed to the middleware.
+Function1 are called when applying the middleware anf gives access to the `send` method the the bus. The `originObject` should only be used when a middleware is used to send all message into Redux, and a Redux middleware created with `createReduxMiddleware` in combination. This stops actions from being sent in an infinite loop. See test files for example usages.
+Function2 are called on every message passing through the bus.
 
 #### Arguments
-- `fn: Function(channel, message, source)` The function to be called with every message on the bus.
+- `fn: Function1(send, originObject) => Function2(channel, message, source)` The function to be called with every message on the bus.
 
 #### Returns `void`
 

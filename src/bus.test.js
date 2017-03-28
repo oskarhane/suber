@@ -67,14 +67,14 @@ describe('Suber core testing', () => {
     expect(cb2).toHaveBeenCalledTimes(1)
   })
 
-  test('self passes on `_responseChannel` to tell subs where to respond', () => {
+  test('self passes on `$$responseChannel` to tell subs where to respond', () => {
     // Given
     const b = createBus()
     let cb = jest.fn()
     const data = {id: 1}
     const data2 = {id: 2}
     const cb2 = (data) => {
-      b.send(data._responseChannel, data2)
+      b.send(data['$$responseChannel'], data2)
     }
     const channel = 'my channel'
 

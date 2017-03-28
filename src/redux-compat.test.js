@@ -28,6 +28,39 @@ test('can create a redux middleware that repeats all redux actions into bus', ()
   expect(cb).toHaveBeenCalledTimes(1)
 })
 
+test('can combine createReduxMiddleware and bus.applyMiddleware', () => {
+  // Given
+  let suberCb = jest.fn()
+  const insideReduxSubscribeCb = jest.fn()
+  const b = createBus()
+  const myMw = (_, origin) => (channel, message, source) => {
+    // No loop-backs
+    if (source === 'redux') return
+    // Send to Redux with the channel as the action type
+    store.dispatch(Object.assign({}, message, {type: channel}, origin))
+  }
+  const channel = 'FROM_SUBER'
+  const data = {id: 10}
+  const reduxMw = createReduxMiddleware(b)
+
+  // When
+  b.take(channel, suberCb)
+  let store = createStore(
+    (a) => a,
+    applyMiddleware(reduxMw)
+  )
+  store.subscribe((state) => {
+    insideReduxSubscribeCb()
+  })
+  b.applyMiddleware(myMw)
+  b.send(channel, data)
+
+  // Then
+  expect(suberCb).toHaveBeenCalledWith(data)
+  expect(suberCb).toHaveBeenCalledTimes(1)
+  expect(insideReduxSubscribeCb).toHaveBeenCalledTimes(1)
+})
+
 test('can create a redux middleware that let actions go to redux store before sending to suber', (done) => {
   // Given
   const b = createBus()
