@@ -57,6 +57,7 @@ export const createBus = () => {
   let nextId = 0
   const subscriptions = {}
   let middlewares = []
+  const _originObject = { '$$origin': 'suber' }
 
   // Exposed functions
   return {
@@ -66,7 +67,7 @@ export const createBus = () => {
     send,
     self: _self,
     applyMiddleware: function () {
-      Array.from(arguments).forEach((arg) => middlewares.push(arg(send)))
+      Array.from(arguments).forEach((arg) => middlewares.push(arg(send, _originObject)))
     },
     applyReduxMiddleware: function () {
       Array.from(arguments).forEach((arg) => {
@@ -81,7 +82,11 @@ export const createBus = () => {
 }
 export const createReduxMiddleware = (bus) => () => (next) => (action) => {
   const res = next(action)
-  bus.send(action.type, action, 'redux')
+  if (!_isSuberOrigin(action)) bus.send(action.type, action, 'redux')
   return res
+}
+
+const _isSuberOrigin = (action) => {
+  return action['$$origin'] && action['$$origin'] === 'suber'
 }
 
